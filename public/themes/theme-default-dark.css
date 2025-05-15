@@ -1,0 +1,86 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --background: #222;
+    --color: #ccc;
+    --margin: 0px;
+    --paddind: 5px;
+}
+
+:root {
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    font-size: 12px;
+
+    color-scheme: light dark;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+}
+
+
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(65, 94, 156) rgba(0, 0, 0, 0.2);
+}
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 16px;
+}
+*::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+*::-webkit-scrollbar-thumb {
+    background-color: rgb(65, 94, 156);
+    border-radius: 10px;
+    border: 1px none rgba(0, 0, 0, 0.2);
+}
+
+
+
+.body.host {
+    background-color: #222;
+    color: #ccc;
+}
+
+
+.top.host {
+    background-color: #383030;
+    color: #dcc;
+}
+.top.slot {
+    margin: 0 0px 0px 0;
+    padding: 5px;
+}
+
+.bottom.host {
+    background-color: #303830;
+    color: #cdc;
+}
+
+.bottom.slot {
+    margin: 0px 0px 0 0;
+    padding: 5px;
+}
+
+
+.right.host {
+    background-color: #303038;
+    color: #ccd;
+}
+
+.right.slot {
+    margin: 0 0 0 0px;
+    padding: 5px;
+}
+
+

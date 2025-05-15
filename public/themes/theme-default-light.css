@@ -1,0 +1,33 @@
+:root {
+    --background: #191919;
+    --color: #ccc;
+    --margin: 0px;
+    --paddind: 5px;
+}
+
+
+.body{
+    background-color:  var(--background);
+    color:  var(--color);
+}
+
+.top{
+    background-color: #dcc;
+    color: #383030;
+    margin: 0 var(--margin) var(--margin) 0;
+    padding: var(--paddind);
+}
+
+.bottom{
+    background-color: #cdc;
+    color: #303830;
+    margin: var(--margin) var(--margin) 0 0;
+    padding: var(--paddind);
+}
+
+.right{
+    background-color: #ccd;
+    color: #303038;
+    margin: 0 0 0 var(--margin);
+    padding: var(--paddind);
+}
