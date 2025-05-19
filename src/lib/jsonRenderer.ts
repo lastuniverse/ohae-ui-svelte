@@ -10,6 +10,13 @@ export interface IUiNodeConfig {
   [key: string]: any;
 }
 
+const tagsMap: Record<string, string> = {
+  layout: 'ohae-layout',
+  resizer: 'ohae-resizer',
+  separator: 'ohae-separator',
+  icon: 'ohae-icon-of-type'
+};
+
 export async function createUI(config: UiNodeConfig, parentElement: HTMLElement): Promise<HTMLElement|Text|null> {
   if (!config) {
     console.error("Invalid config:", config);
@@ -31,23 +38,20 @@ export async function createUI(config: UiNodeConfig, parentElement: HTMLElement)
 
 function createUiElement(config: UiNodeConfig, parentElement: HTMLElement): HTMLElement | Text | null {
   if (typeof config === 'object') {
-    return renterElementFromJson(config, parentElement);
+    return renderElementFromJson(config, parentElement);
   } else {
     return renterElementFromText(config, parentElement);
   }
 }
 
-function renterElementFromJson(config: IUiNodeConfig, parentElement: HTMLElement): HTMLElement | null {
+function renderElementFromJson(config: IUiNodeConfig, parentElement: HTMLElement): HTMLElement | null {
   if (!config.view) {
     console.error("Invalid config or missing view:", config);
     return null;
   }
 
-  const tagName = config.view === 'layout' ? 'ohae-layout'
-    : config.view === 'resizer' ? 'ohae-resizer'
-    : config.view; // Для 'div', 'span' и т.д.
-
-
+  const tagName = tagsMap[config.view] ?? config.view;
+  
   const element = document.createElement(tagName);
   if(!element) {
     console.error("Invalid config or missing view:", config);

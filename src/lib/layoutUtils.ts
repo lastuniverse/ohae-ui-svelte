@@ -139,13 +139,17 @@ export function determineResizerDirection(host: HTMLElement | undefined): TFlexD
     return null; // Не удалось определить
 }
 
-export function asignLayoutProps(getShadowRoot: () => ShadowRoot | null, sizeProps: ILayoutSizeProps): void {
+// export function asignLayoutProps(getShadowRoot: () => ShadowRoot | null, sizeProps: ILayoutSizeProps): void {
+export function asignLayoutProps(getHost: () => HTMLElement | null, sizeProps: ILayoutSizeProps): void {
     onMount(() => {
-    const shadowRoot = getShadowRoot() as ShadowRoot;
-    if (!shadowRoot) return;
+    // const shadowRoot = getShadowRoot() as ShadowRoot;
+    // if (!shadowRoot) return;
 
-    const hostElement = shadowRoot.host as HTMLElement;
-    const style = hostElement.style;
+    // const hostElement = shadowRoot.host as HTMLElement;
+    // const style = hostElement.style;
+    const host = getHost();
+    if(!host) return;
+    const style = host.style;
 
     // if(sizeProps.width) style.width = sizeProps.width.toString();
     // if(sizeProps.height) style.height = sizeProps.height.toString();

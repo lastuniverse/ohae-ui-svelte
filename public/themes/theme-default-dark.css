@@ -1,3 +1,5 @@
+@import url("../fontawesome-free-6.7.2-web/css/all.min.css");
+
 * {
     box-sizing: border-box;
 }
@@ -7,6 +9,7 @@
     --color: #ccc;
     --margin: 0px;
     --paddind: 5px;
+    background-color: #222;
 }
 
 :root {
@@ -26,7 +29,7 @@
 
 
 
-/* ===== Scrollbar CSS ===== */
+/* ===== scrollbars CSS ===== */
 /* Firefox */
 * {
     scrollbar-width: thin;
@@ -47,11 +50,36 @@
 
 
 
+/* ===== resizers CSS ===== */
+.slot.resizer{
+    background-color: #292929;
+}
+
+.slot.resizer:hover{
+    background-color: #191919;
+}
+
+.slot.resizer:active,
+.slot.resizer.dragging{
+    background-color: #555;
+}
+
+
+/* ===== personal elements CSS ===== */
 .body.host {
-    background-color: #222;
+    background-color: transparent;
     color: #ccc;
 }
 
+.header.host {
+    background-color: #181818;
+    color: #ccc;
+}
+
+.footer.host {
+    background-color: #181818;
+    color: #ccc;
+}
 
 .top.host {
     background-color: #383030;

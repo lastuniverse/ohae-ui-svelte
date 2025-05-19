@@ -7,6 +7,8 @@ import { themeStore } from './lib/useShadowTheme';
 // Переменные можно не использовать, если только для регистрации.
 import './components/lauout/OhaeLayoutView.svelte';
 import './components/lauout/OhaeResizerView.svelte';
+import './components/lauout/OhaeSeparatorView.svelte';
+import './components/icons/OhaeIconOfTypeView.svelte';
 
 // 2. Импортируйте вашу конфигурацию и функцию рендеринга
 import { mainViewConfig } from './ui-configs/mainViewConfig.js';

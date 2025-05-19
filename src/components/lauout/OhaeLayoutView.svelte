@@ -26,8 +26,6 @@
     customStyle = "", // Дополнительные пользовательские стили строкой
   }: ILayoutProps = $props();
 
-  let container: HTMLDivElement;
-
   const calculatedStyles = $derived(calculateLayoutStyles({
     align,
     valign,
@@ -37,7 +35,7 @@
     margin,
   }));
 
-  asignLayoutProps(() => container?.getRootNode() as ShadowRoot | null, {
+  asignLayoutProps(() => $host(), {
     flex,
     overflow,
     overflowX,
@@ -51,12 +49,10 @@
     collapsed,
   });
 
-  useShadowTheme(() => container?.getRootNode() as ShadowRoot | null);
+  useShadowTheme(() => $host().shadowRoot);
 </script>
 
-<!-- <link rel="stylesheet" data-managed-theme="true" href="/themes/theme-default-dark.css"> -->
 <div
-  bind:this={container}
   class="slot {className}"
   style:flex-direction={calculatedStyles.finalFlexDirection}
   style:align-items={calculatedStyles.finalAlignItems}
@@ -77,11 +73,10 @@
   }
   
   :host {
-    /* display: contents; */
-    /* display: flex; */
     flex: 1 1 0;
     overflow: auto;
     border-radius: 3px;
+    width: 100%;
   }
 
   .slot {
@@ -94,6 +89,4 @@
     width: 100%;
     height: 100%;
   }
-
-
 </style>

@@ -1,16 +1,18 @@
 <!-- <svelte:options customElement={{ tag: "ohae-resizer", shadow: "none" }} /> -->
+<!-- <svelte:options customElement={{ tag: "ohae-resizer", shadow: "open" }} /> -->
 <svelte:options customElement={{ tag: "ohae-resizer" }} />
 
 <script lang="ts">
-  import { onMount } from "svelte";
-  import {
-    determineResizerDirection,
-    type TFlexDirection,
-  } from "../../lib/layoutUtils";
+  import { determineResizerDirection, type TFlexDirection } from "../../lib/layoutUtils";
   import { useShadowTheme } from "../../lib/useShadowTheme";
 
-  let { className = undefined, direction = "column" as TFlexDirection } =
-    $props();
+  export const resizeDeny: boolean = true;
+
+  let { 
+    className = undefined,
+  }: { 
+    className?: string;
+  } = $props();
 
   interface IElement {
     element: HTMLElement;
@@ -20,47 +22,20 @@
     newSize: number;
   }
 
-  let internalDivRef: HTMLDivElement; // внутренний <div class="resizer">
-  let customElementRef: HTMLElement; // кастомный элемент <ohae-resizer>
-
-  let isDragging = false;
+  let isDragging = $state(false);
   let startX = 0;
   let startY = 0;
   let beforeElements: IElement[] = [];
   let afterElements: IElement[] = [];
   let currentDragDelta = 0; // Это Math.abs(mouseDelta)
-  let isRowDirection = $derived(direction === "row");
 
-  useShadowTheme(() => internalDivRef?.getRootNode() as ShadowRoot | null);
+  let direction = $derived(determineResizerDirection($host())) as TFlexDirection;
+  let isRowDirection: boolean = $derived(direction === "row");
 
-  onMount(() => {
-    if (internalDivRef) {
-      const rootNode = internalDivRef.getRootNode();
-      if (rootNode instanceof ShadowRoot) {
-        customElementRef = rootNode.host as HTMLElement;
-      } else {
-        customElementRef = internalDivRef;
-      }
-    }
-    direction = determineResizerDirection(customElementRef) ?? direction;
-
-    customElementRef.addEventListener("touchstart", handleTouchDown, { passive: false });
-    return () => {
-      customElementRef.removeEventListener("touchstart", handleTouchDown);
-    };
-  });
+  useShadowTheme(() => $host().shadowRoot);
 
   function getElementSize(element: HTMLElement): number {
     return isRowDirection ? element.offsetHeight : element.offsetWidth;
-    // const isFlexSize = element.getAttribute("flex-size");
-    // if(isFlexSize){
-    //   const size = parseFloat(element.style.flexGrow);
-    //   return size;
-    // } else {
-    //   element.setAttribute("flex-size", "true");
-    //   const size = isRowDirection ? element.offsetHeight : element.offsetWidth;
-    //   return size;
-    // }
   }
 
   function getElementMinSize(element: HTMLElement): number {
@@ -76,12 +51,11 @@
   }
 
   function getResizedElemens(): HTMLElement[] {
-    if (!customElementRef?.parentElement) return [];
-
-    const parentElement = customElementRef.parentElement;
+    const parentElement = $host().parentElement;
+    if (!parentElement) return [];
     const parentSlot =
-      parentElement.shadowRoot?.querySelector(".slot") ??
-      parentElement.querySelector(".slot") ??
+      parentElement.shadowRoot?.querySelector(".resizer") ??
+      parentElement.querySelector(".resizer") ??
       parentElement;    
     const children = Array.from(parentSlot.children) as HTMLElement[];
     return children.filter(item=>!!item);
@@ -100,7 +74,8 @@
   }
 
   function storeElements(): void {
-    if (!customElementRef?.parentElement) return;
+    const selfElement = $host();
+    if (!selfElement.parentElement) return;
 
     const children = getResizedElemens();
     beforeElements = [];
@@ -108,16 +83,15 @@
     let isBefore = true;
 
     children.forEach((element) => {
-      const isSelf = element === customElementRef;
-      if (isSelf) {
+      if (element === selfElement) {
         isBefore = false;
         return;
       }
 
       const isHTMLElement = element instanceof HTMLElement;
       const isVisible = getComputedStyle(element).display !== "none";
-      const isResizer = element.tagName.toLowerCase() === "ohae-resizer";
-      const isNeedIgnore = !isHTMLElement || !isVisible || isResizer;
+      const isResizeDeny = 'resizeDeny' in element;
+      const isNeedIgnore = !isHTMLElement || !isVisible || isResizeDeny;
       if (isNeedIgnore) return;
 
       const size = getElementSize(element);
@@ -185,9 +159,8 @@
   }
 
   function handleTouchDown(event: TouchEvent): void {
-    if (!customElementRef) return;
+    // if (!customElementRef) return;
 
-    event.preventDefault();
     isDragging = true;
     startX = event.touches[0]?.clientX ?? 0;
     startY = event.touches[0]?.clientY ?? 0;
@@ -198,7 +171,7 @@
   }
 
   function handleMouseDown(event: MouseEvent): void {
-    if (!customElementRef) return;
+    // if (!customElementRef) return;
 
     event.preventDefault();
     isDragging = true;
@@ -263,8 +236,7 @@ function getMouseDelta(event: MouseEvent | TouchEvent): number {
 </script>
 
 <div
-  bind:this={internalDivRef}
-  class="resizer {className}"
+  class="slot resizer {className}"
   class:cols={direction === "column"}
   class:rows={direction === "row"}
   class:dragging={isDragging}
@@ -275,12 +247,13 @@ function getMouseDelta(event: MouseEvent | TouchEvent): number {
   style:min-height={direction === "row" ? "2px" : undefined}
   style:max-height={direction === "row" ? "2px" : undefined}
   onmousedown={handleMouseDown}
+  ontouchstart={handleTouchDown}
   tabindex="0"
   role="separator"
-  aria-orientation={direction === "column" ? "vertical" : "horizontal"}
+  aria-orientation={direction === "column" ? "horizontal" : "vertical"}
 >
-  <div class="overlay1"></div>
-  <div class="overlay2"></div>
+  <div class="overlay"></div>
+  <div class="interactive"></div>
 </div>
 
 <style>
@@ -289,12 +262,11 @@ function getMouseDelta(event: MouseEvent | TouchEvent): number {
     border: none;
     padding: 0;
     margin: 0;
-    /* overflow: hidden; */
   }
 
   :host {
     /* flex: 0 0 4px; */
-    padding: 0.5px;
+    padding: 0px;
   }
 
   .resizer {
@@ -315,53 +287,43 @@ function getMouseDelta(event: MouseEvent | TouchEvent): number {
     cursor: row-resize;
   }
 
-  .resizer.cols .overlay1 {
+  .resizer.cols .overlay {
     background: url("data:image/gif;base64,R0lGODlhAwAdAIABAJWr7f///yH5BAEAAAEALAAAAAADAB0AAAIQRBynaaje0pORrWnhrbi3AgA7")
       no-repeat center center;
   }
-  .resizer.rows .overlay1 {
+  .resizer.rows .overlay {
     background: url("data:image/gif;base64,R0lGODlhHQADAIABAJWr7f///yH5BAEAAAEALAAAAAAdAAMAAAINRIynyesBo5y0tuswKgA7")
       no-repeat center center;
   }
 
-  .resizer:hover .overlay1 {
-    background-color: #191919;
-  }
-  .resizer.dragging .overlay1,
-  .resizer:active .overlay1 {
-    background-color: #555;
-  }
-
-  .resizer.cols .overlay2 {
+  .resizer.cols .interactive {
     transform: scaleX(4);
   }
-  .resizer.rows .overlay2 {
+  .resizer.rows .interactive {
+    transform: scaleY(4);
+  }
+  
+  .resizer.cols:hover .interactive,
+  .resizer.cols.dragging .interactive,
+  .resizer.cols:active .interactive {
+    transform: scaleX(4);
+  }
+  .resizer.rows:hover .interactive,
+  .resizer.rows.dragging .interactive,
+  .resizer.rows:active .interactive {
     transform: scaleY(4);
   }
 
-  .resizer.cols:hover .overlay2,
-  .resizer.cols.dragging .overlay2,
-  .resizer.cols:active .overlay2 {
-    transform: scaleX(4);
-  }
-  .resizer.rows:hover .overlay2,
-  .resizer.rows.dragging .overlay2,
-  .resizer.rows:active .overlay2 {
-    transform: scaleY(4);
-  }
-
-  .overlay1,
-  .overlay2 {
+  .overlay,
+  .interactive {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
   }
-  .overlay1 {
-    background-color: #222;
-  } /* Базовый цвет самого ресайзера */
-  .overlay2 {
+
+  .interactive {
     background: transparent;
   }
 </style>
