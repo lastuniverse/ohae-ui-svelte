@@ -1,16 +1,16 @@
+<!-- <svelte:options customElement={{ tag: "ohae-resizer", shadow: "none" }} /> -->
 <!-- <svelte:options customElement={{ tag: "ohae-resizer", shadow: "open" }} /> -->
 <svelte:options customElement={{ tag: "ohae-resizer" }} />
 
 <script lang="ts">
-  import type { KeyboardEventHandler } from "svelte/elements";
   import { determineResizerDirection, type TFlexDirection } from "../../lib/layoutUtils";
   import { useShadowTheme } from "../../lib/useShadowTheme";
 
   export const resizeDeny: boolean = true;
 
-  let {
+  let { 
     className = undefined,
-  }: {
+  }: { 
     className?: string;
   } = $props();
 
@@ -29,9 +29,7 @@
   let afterElements: IElement[] = [];
   let currentDragDelta = 0; // Это Math.abs(mouseDelta)
 
-  let direction = $derived(
-    determineResizerDirection($host()),
-  ) as TFlexDirection;
+  let direction = $derived(determineResizerDirection($host())) as TFlexDirection;
   let isRowDirection: boolean = $derived(direction === "row");
 
   useShadowTheme(() => $host().shadowRoot);
@@ -43,33 +41,13 @@
   function getElementMinSize(element: HTMLElement): number {
     const style = getComputedStyle(element);
     const layoutLike = element as any;
-    return (
-      parseFloat(
-        isRowDirection
-          ? (layoutLike.minHeight ??
-              element.getAttribute("min-height") ??
-              style.minHeight)
-          : (layoutLike.minWidth ??
-              element.getAttribute("min-width") ??
-              style.minWidth),
-      ) || 0
-    );
+    return parseFloat(isRowDirection ? layoutLike.minHeight ?? element.getAttribute("min-height") ?? style.minHeight  : layoutLike.minWidth ?? element.getAttribute("min-width") ?? style.minWidth) || 0;
   }
 
   function getElementMaxSize(element: HTMLElement): number {
     const style = getComputedStyle(element);
     const layoutLike = element as any;
-    return (
-      parseFloat(
-        isRowDirection
-          ? (layoutLike.maxHeight ??
-              element.getAttribute("max-height") ??
-              style.maxHeight)
-          : (layoutLike.maxWidth ??
-              element.getAttribute("max-width") ??
-              style.maxWidth),
-      ) || Infinity
-    );
+    return parseFloat(isRowDirection ? layoutLike.maxHeight ?? element.getAttribute("max-height") ?? style.maxHeight : layoutLike.maxWidth ?? element.getAttribute("max-width") ?? style.maxWidth) || Infinity;
   }
 
   function getResizedElemens(): HTMLElement[] {
@@ -78,9 +56,9 @@
     const parentSlot =
       parentElement.shadowRoot?.querySelector(".resizer") ??
       parentElement.querySelector(".resizer") ??
-      parentElement;
+      parentElement;    
     const children = Array.from(parentSlot.children) as HTMLElement[];
-    return children.filter((item) => !!item);
+    return children.filter(item=>!!item);
   }
 
   function logElementsSizes(): void {
@@ -112,7 +90,7 @@
 
       const isHTMLElement = element instanceof HTMLElement;
       const isVisible = getComputedStyle(element).display !== "none";
-      const isResizeDeny = "resizeDeny" in element;
+      const isResizeDeny = 'resizeDeny' in element;
       const isNeedIgnore = !isHTMLElement || !isVisible || isResizeDeny;
       if (isNeedIgnore) return;
 
@@ -181,6 +159,8 @@
   }
 
   function handleTouchDown(event: TouchEvent): void {
+    // if (!customElementRef) return;
+
     isDragging = true;
     startX = event.touches[0]?.clientX ?? 0;
     startY = event.touches[0]?.clientY ?? 0;
@@ -191,6 +171,8 @@
   }
 
   function handleMouseDown(event: MouseEvent): void {
+    // if (!customElementRef) return;
+
     event.preventDefault();
     isDragging = true;
     startX = event.clientX;
@@ -201,47 +183,45 @@
     window.addEventListener("mouseup", handleMouseUp);
   }
 
-  function getMouseDelta(event: MouseEvent | TouchEvent): number {
-    let clientX: number, clientY: number;
+function getMouseDelta(event: MouseEvent | TouchEvent): number {
+  let clientX: number, clientY: number;
 
-    if (event instanceof TouchEvent) {
-      // Берём первый палец (обычно этого достаточно)
-      clientX = event.touches[0]?.clientX ?? 0;
-      clientY = event.touches[0]?.clientY ?? 0;
-    } else {
-      clientX = event.clientX;
-      clientY = event.clientY;
-    }
-
-    const mouseDelta = isRowDirection ? clientY - startY : clientX - startX;
-
-    return mouseDelta;
+  if (event instanceof TouchEvent) {
+    // Берём первый палец (обычно этого достаточно)
+    clientX = event.touches[0]?.clientX ?? 0;
+    clientY = event.touches[0]?.clientY ?? 0;
+  } else {
+    clientX = event.clientX;
+    clientY = event.clientY;
   }
 
-  function applyResize(delta: number): void {
-    if (delta === 0) return;
+  const mouseDelta = isRowDirection
+    ? clientY - startY
+    : clientX - startX;
 
-    currentDragDelta = Math.abs(delta);
+  return mouseDelta;
+}
+
+  function handleMouseMove(event: MouseEvent | TouchEvent): void {
+    if (!isDragging) return;
+
+    let mouseDelta = getMouseDelta(event);
+
+    currentDragDelta = Math.abs(mouseDelta);
 
     beforeElements.forEach((el) => (el.newSize = el.initialSize));
     afterElements.forEach((el) => (el.newSize = el.initialSize));
 
-    if (delta < 0) {
+    if (mouseDelta < 0) {
       decreaseSizeRecursive([...beforeElements], currentDragDelta);
       increaseSizeRecursive([...afterElements], currentDragDelta);
       decreaseSizeRecursive([...beforeElements], currentDragDelta); // Повторный вызов из оригинала
-    } else if (delta > 0) {
+    } else if (mouseDelta > 0) {
       increaseSizeRecursive([...beforeElements], currentDragDelta);
       decreaseSizeRecursive([...afterElements], currentDragDelta);
       increaseSizeRecursive([...beforeElements], currentDragDelta); // Повторный вызов из оригинала
     }
     applyNewSizes();
-  }
-
-  function handleMouseMove(event: MouseEvent | TouchEvent): void {
-    if (!isDragging) return;
-    const mouseDelta = getMouseDelta(event);
-    applyResize(mouseDelta);
   }
 
   function handleMouseUp(): void {
@@ -253,51 +233,9 @@
     window.removeEventListener("touchend", handleMouseUp);
     logElementsSizes();
   }
-
-  // --- NEW: Keyboard handling ---
-  const KEYBOARD_STEP = 10; // pixels to move per key press
-
-  const handleKeyDown: KeyboardEventHandler<HTMLButtonElement> = (event) => {
-    let delta = 0;
-    let relevantKeyPress = false;
-
-    if (isRowDirection) {
-      // Vertical resizer
-      if (event.key === "ArrowUp") {
-        delta = -KEYBOARD_STEP;
-        relevantKeyPress = true;
-      } else if (event.key === "ArrowDown") {
-        delta = KEYBOARD_STEP;
-        relevantKeyPress = true;
-      }
-    } else {
-      // Horizontal resizer (direction === "column")
-      if (event.key === "ArrowLeft") {
-        delta = -KEYBOARD_STEP;
-        relevantKeyPress = true;
-      } else if (event.key === "ArrowRight") {
-        delta = KEYBOARD_STEP;
-        relevantKeyPress = true;
-      }
-    }
-
-    if (relevantKeyPress) {
-      event.preventDefault(); // Prevent page scrolling
-
-      // For keyboard, each press is a discrete operation, so we store elements each time.
-      storeElements();
-
-      // Apply the resize with the determined delta
-      applyResize(delta);
-
-      logElementsSizes(); // For debugging if needed
-    }
-  };
-  // --- END NEW: Keyboard handling ---
 </script>
 
 <button
-  type="button"
   class="slot resizer {className}"
   class:cols={direction === "column"}
   class:rows={direction === "row"}
@@ -308,19 +246,17 @@
   style:height={direction === "row" ? "2px" : "100%"}
   style:min-height={direction === "row" ? "2px" : undefined}
   style:max-height={direction === "row" ? "2px" : undefined}
-  tabindex="0"
   onmousedown={handleMouseDown}
   ontouchstart={handleTouchDown}
-  onkeydown={handleKeyDown}
   aria-label="Resize panel"
+  tabindex="-1"
 >
-  <span class="overlay"></span>
-  <span class="interactive"></span>
+  <div class="overlay"></div>
+  <div class="interactive"></div>
 </button>
 
 <style>
-  :host,
-  .resizer {
+  :host, .resizer {
     box-sizing: border-box;
     border: none;
     padding: 0;
@@ -340,10 +276,6 @@
     position: relative; /* Оверлеи будут absolutely positioned относительно этого div */
     user-select: none;
     touch-action: none;
-  }
-
-  .resizer:focus {
-    outline: none; /* Полностью убирает стандартный outline */
   }
 
   .resizer.cols {
@@ -369,7 +301,7 @@
   .resizer.rows .interactive {
     transform: scaleY(4);
   }
-
+  
   .resizer.cols:hover .interactive,
   .resizer.cols.dragging .interactive,
   .resizer.cols:active .interactive {

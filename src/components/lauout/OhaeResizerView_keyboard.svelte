@@ -3,7 +3,10 @@
 
 <script lang="ts">
   import type { KeyboardEventHandler } from "svelte/elements";
-  import { determineResizerDirection, type TFlexDirection } from "../../lib/layoutUtils";
+  import {
+    determineResizerDirection,
+    type TFlexDirection,
+  } from "../../lib/layoutUtils";
   import { useShadowTheme } from "../../lib/useShadowTheme";
 
   export const resizeDeny: boolean = true;
@@ -340,10 +343,6 @@
     position: relative; /* Оверлеи будут absolutely positioned относительно этого div */
     user-select: none;
     touch-action: none;
-  }
-
-  .resizer:focus {
-    outline: none; /* Полностью убирает стандартный outline */
   }
 
   .resizer.cols {
