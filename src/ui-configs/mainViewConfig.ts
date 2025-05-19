@@ -1,9 +1,9 @@
-import type { IUiNodeConfig } from "../lib/jsonRenderer";
+import type { UiNodeConfig } from "../components/OhaeComponetTypes";
 import { bodyViewConfig } from "./bodyViewConfig";
 import { footerViewConfig } from "./footerViewConfig";
 import { headerViewConfig } from "./headerViewConfig";
 
-export const mainViewConfig: IUiNodeConfig = {
+export const mainViewConfig: UiNodeConfig = {
   view: 'layout',
   width: '100%',
   height: '100vh',

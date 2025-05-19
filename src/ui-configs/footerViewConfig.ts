@@ -1,6 +1,6 @@
-import type { IUiNodeConfig } from "../lib/jsonRenderer";
+import type { UiNodeConfig } from "../components/OhaeComponetTypes";
 
-export const footerViewConfig: IUiNodeConfig = {
+export const footerViewConfig: UiNodeConfig = {
     view: 'layout',
     direction: 'row',
     overflow: 'auto',

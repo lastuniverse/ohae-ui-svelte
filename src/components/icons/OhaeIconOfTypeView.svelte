@@ -1,54 +1,53 @@
 <svelte:options customElement={{ tag: "ohae-icon-of-type" }} />
 
 <script lang="ts">
-  import { asignLayoutProps, calculateLayoutStyles, type ILayoutProps } from '../../lib/layoutUtils';
-  import { useShadowTheme } from '../../lib/useShadowTheme';
+    import { asignLayoutProps, calculateLayoutStyles } from "../../lib/layoutUtils";
+    import { useShadowTheme } from "../../lib/useShadowTheme";
+    import type { IconTypeDefinition, IOhaeIconOfTypeConfig } from "./OhaeIconOfTypeTypes";
 
-  // Тип для данных иконки, передаваемых через пропс `types`
-  type IconTypeDefinition = {
-    icon: string;    // Например, 'fa-home', 'fas fa-user', 'fa fa-folder'
-    color?: string;  // Цвет по умолчанию для этого типа, например, '#FF0000'
-  };
+    // Тип для данных иконки, передаваемых через пропс `types`
 
-  let {
-    size = 12,
-    padding = undefined,
-    margin = undefined,
-    className = undefined,
-    value = null as string | null,
-    types = {} as Record<string, IconTypeDefinition>, // Обязательный для работы компонента
-    color = null as string | null, // Пользовательский цвет
-  }: ILayoutProps = $props();
 
-  const iconDefinition = $derived(types && value ? types[value] : null);
+    let {
+        size = 12,
+        padding = undefined,
+        margin = undefined,
+        className = undefined,
+        value = undefined,
+        types = {},
+        color = undefined,
+    }: IOhaeIconOfTypeConfig = $props();
 
-  const calculatedStyles = $derived(calculateLayoutStyles({
-    align: 'center',
-    valign: 'center',
-    padding,
-    margin,
-  }));
+    const iconDefinition = $derived(types?.[value??""]);
 
-  asignLayoutProps(() => $host(), {
-    maxWidth: size,
-    maxHeight: size,
-    minWidth: size,
-    minHeight: size,
-  });  
-  
-  useShadowTheme(() => $host().shadowRoot);
+    const calculatedStyles = $derived(
+        calculateLayoutStyles({
+            align: "center",
+            valign: "center",
+            padding,
+            margin,
+        }),
+    );
 
-  function getIconClasse(iconData: IconTypeDefinition){
-    let icon = iconDefinition?.icon.trim().split(/\s+/)[0] ?? "fa-question-circle";
-    const parts = icon.split('-');
-    let prefix = parts[0] ?? "fa";
-    return `${prefix} ${icon}`;
-  }
-  const iconClasses = $derived(getIconClasse(iconDefinition));
-  const finalColor = $derived(iconDefinition?.color ?? color ?? '#f00');
+    asignLayoutProps(() => $host(), {
+        maxWidth: size,
+        maxHeight: size,
+        minWidth: size,
+        minHeight: size,
+    });
+
+    useShadowTheme(() => $host().shadowRoot);
+
+    function getIconClasses(iconData?: IconTypeDefinition) {
+        let icon =
+            iconData?.icon.trim().split(/\s+/)[0] ?? "fa-question-circle";
+        const parts = icon.split("-");
+        let prefix = parts[0] ?? "fa";
+        return `${prefix} ${icon}`;
+    }
+    const iconClasses = $derived(getIconClasses(iconDefinition));
+    const finalColor = $derived(iconDefinition?.color ?? color ?? "#f00");
 </script>
-
-
 
 <div
     class="slot icon-container {className}"
@@ -58,13 +57,12 @@
     style:padding={calculatedStyles.paddingStyle}
     style:margin={calculatedStyles.marginStyle}
 >
-    <span 
-      class="{iconClasses} icon-fa-style"
-      style:color={finalColor}
-      style:font-size={size+'px'}
+    <span
+        class="{iconClasses} icon-fa-style"
+        style:color={finalColor}
+        style:font-size={size + "px"}
     ></span>
 </div>
-
 
 <style>
     .icon-container {
@@ -79,8 +77,9 @@
     .icon-container:hover .icon-fa-style {
         opacity: 0.8;
     }
-    
-    .icon-fa-style { /* Базовый класс для <i> тега */
+
+    .icon-fa-style {
+        /* Базовый класс для <i> тега */
         transition: opacity 0.2s;
     }
 </style>

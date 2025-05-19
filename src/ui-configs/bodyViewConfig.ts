@@ -1,6 +1,7 @@
-import type { IUiNodeConfig } from "../lib/jsonRenderer";
+import type { UiNodeConfig } from "../components/OhaeComponetTypes";
+import { tabsViewConfig } from "./tabsViewConfig";
 
-export const bodyViewConfig: IUiNodeConfig = {
+export const bodyViewConfig: UiNodeConfig = {
     view: 'layout',
     flex: 1,
     direction: 'row',
@@ -114,10 +115,11 @@ export const bodyViewConfig: IUiNodeConfig = {
             direction: 'row',
             overflow: 'auto',
             className: 'right',
-            body: [
-                { view: 'div', body: 'minHeight: 0' },
-                { view: 'div', body: 'maxHeight: undefined' }
-            ]
+            body: tabsViewConfig
+            // body: [
+            //     { view: 'div', body: 'minHeight: 0' },
+            //     { view: 'div', body: 'maxHeight: undefined' }
+            // ]
         }
     ]
 };

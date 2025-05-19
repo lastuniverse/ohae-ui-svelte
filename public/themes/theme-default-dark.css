@@ -55,7 +55,9 @@
     background-color: #292929;
 }
 
-.slot.resizer:focus,
+.slot.resizer:focus {
+    background-color: rgb(65, 94, 156);
+}
 .slot.resizer:hover {
     background-color: #191919;
 }
