@@ -4,11 +4,16 @@
 <script lang="ts">
     import type { KeyboardEventHandler } from "svelte/elements";
     import { determineResizerDirection } from "../../lib/layoutUtils";
-    import { useShadowTheme } from "../../lib/useShadowTheme";
     import type { TFlexDirection } from "./OhaeLayoutTypes";
     import type { IOhaeResizerConfig } from "./OhaeResizerTypes";
+    import { initOhae } from "../../lib/ohaeUtils";
 
     export const resizeDeny: boolean = true;
+    initOhae($host(), {
+        modifyAppendChild: true,
+        loadFontsAwesome: false,
+        loadOhaeTheme: true,
+    });
 
     let {
         className = undefined,
@@ -33,8 +38,6 @@
         determineResizerDirection($host()),
     ) as TFlexDirection;
     let isRowDirection: boolean = $derived(direction === "row");
-
-    useShadowTheme(() => $host().shadowRoot);
 
     function getElementSize(element: HTMLElement): number {
         return isRowDirection ? element.offsetHeight : element.offsetWidth;
@@ -76,8 +79,8 @@
         const parentElement = $host().parentElement;
         if (!parentElement) return [];
         const parentSlot =
-            parentElement.shadowRoot?.querySelector(".resizer") ??
-            parentElement.querySelector(".resizer") ??
+            parentElement.shadowRoot?.querySelector(".default") ??
+            parentElement.querySelector(".default") ??
             parentElement;
         const children = Array.from(parentSlot.children) as HTMLElement[];
         return children.filter((item) => !!item);
@@ -300,7 +303,7 @@
 
 <button
     type="button"
-    class="slot resizer {className}"
+    class="slot default resizer {className}"
     class:cols={direction === "column"}
     class:rows={direction === "row"}
     class:dragging={isDragging}
@@ -322,9 +325,9 @@
 
 <style>
     :host,
-    .resizer {
+    .default {
         box-sizing: border-box;
-        background-color: transparent;
+        /* background-color: transparent; */
         border: none;
         padding: 0;
         margin: 0;
@@ -335,7 +338,7 @@
         padding: 0px;
     }
 
-    .resizer {
+    .default {
         /* margin: 1px; */
         display: flex;
         align-items: center;
@@ -343,44 +346,45 @@
         position: relative; /* Оверлеи будут absolutely positioned относительно этого div */
         user-select: none;
         touch-action: none;
+        background-color: #000;
     }
 
-    .resizer:focus {
-        outline: none; /* Полностью убирает стандартный outline */
+    .default:focus {
+        outline: none;
     }
 
-    .resizer.cols {
+    .default.cols {
         cursor: col-resize;
     }
 
-    .resizer.rows {
+    .default.rows {
         cursor: row-resize;
     }
 
-    .resizer.cols .overlay {
+    .default.cols .overlay {
         background: url("data:image/gif;base64,R0lGODlhAwAdAIABAJWr7f///yH5BAEAAAEALAAAAAADAB0AAAIQRBynaaje0pORrWnhrbi3AgA7")
             no-repeat center center;
     }
-    .resizer.rows .overlay {
+    .default.rows .overlay {
         background: url("data:image/gif;base64,R0lGODlhHQADAIABAJWr7f///yH5BAEAAAEALAAAAAAdAAMAAAINRIynyesBo5y0tuswKgA7")
             no-repeat center center;
     }
 
-    .resizer.cols .interactive {
+    .default.cols .interactive {
         transform: scaleX(4);
     }
-    .resizer.rows .interactive {
+    .default.rows .interactive {
         transform: scaleY(4);
     }
 
-    .resizer.cols:hover .interactive,
-    .resizer.cols.dragging .interactive,
-    .resizer.cols:active .interactive {
+    .default.cols:hover .interactive,
+    .default.cols.dragging .interactive,
+    .default.cols:active .interactive {
         transform: scaleX(4);
     }
-    .resizer.rows:hover .interactive,
-    .resizer.rows.dragging .interactive,
-    .resizer.rows:active .interactive {
+    .default.rows:hover .interactive,
+    .default.rows.dragging .interactive,
+    .default.rows:active .interactive {
         transform: scaleY(4);
     }
 

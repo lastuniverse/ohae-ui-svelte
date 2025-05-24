@@ -34,7 +34,7 @@
     $effect(() => {
         assignColors($host(), {
             "--host": "bodyBgColor",
-            // "--head": "tabsBgColor", // Если нужно, чтобы фон хедера тоже менялся
+            // "--head": "tabsBgColor",
         });
     });
 
@@ -47,7 +47,7 @@
             node.getAttribute("id") ||
             `ohae-tab-item-${tabsData.length}-${Math.random().toString(36).substring(2, 9)}`;
         node.setAttribute("id", id);
-        node.backgroundColor = node.backgroundColor ?? tabsBgColor; // Используем tabsBgColor как fallback
+        node.backgroundColor = node.backgroundColor ?? tabsBgColor;
         tabsData.push({
             id,
             header: node.header || "unamed",
@@ -55,11 +55,6 @@
             backgroundColor: node.backgroundColor,
             tabItemElement: node,
         });
-        // Если это первый добавленный таб, сделать его активным
-        if (tabsData.length === 1 && activeTabIndex === 0) {
-             // Инициализация начального состояния видимости
-            showTab(0);
-        }
     }
 
     function isOhaeTabItem(node?: Node): node is TOhaeTabItemView {
@@ -74,6 +69,7 @@
             item.tabItemElement.collapsed = activeTabIndex !== index;
         });
     }
+
 
     function handleHeaderWheel(event: WheelEvent) {
         const headerElement = event.currentTarget as HTMLElement;
@@ -109,35 +105,20 @@
             // }
             headerElement.scrollTop += scrollAmount;
         }
-    }
-
-    function handleTabsScroollWithKeyboard(e: KeyboardEvent, index: number){
-        // Базовая навигация стрелками
-        let newIndex = index;
-        const isHorizontal = tabsSide === 'top' || tabsSide === 'bottom';
-        if (isHorizontal) {
-            if (e.key === 'ArrowLeft') newIndex--;
-            else if (e.key === 'ArrowRight') newIndex++;
-        } else {
-            if (e.key === 'ArrowUp') newIndex--;
-            else if (e.key === 'ArrowDown') newIndex++;
-        }
-
-        if (newIndex !== index && newIndex >= 0 && newIndex < tabsData.length) {
-            e.preventDefault();
-            showTab(newIndex);
-            const nextButton = $host().shadowRoot?.getElementById(`btn-${tabsData[newIndex].id}`);
-            nextButton?.focus();
-        }
-    }
+    }    
 </script>
 
-<div
+<div 
+    class="slot header {className}" 
+    role="presentation"
+    onwheel={(e:MouseEvent)=>{}}
+>
+<!-- <div
     class="slot header {className || ''}"
     role="tablist"
     aria-label="Список вкладок"
     onwheel={handleHeaderWheel}
->
+> -->
     {#each tabsData as item, index (item.id)}
         <ohae-tab-button
             label={item.header}
@@ -146,16 +127,17 @@
             current={index === activeTabIndex}
             backgroundColor={item.backgroundColor}
             onclick={() => showTab(index)}
-            onkeydown={(e: KeyboardEvent) => handleTabsScroollWithKeyboard(e, index)}
+            onkeydown={(e: KeyboardEvent) => {}}
             aria-controls={item.id}
             id={`btn-${item.id}`}
             role="tab"
             aria-selected={index === activeTabIndex}
-            tabindex={index === activeTabIndex ? 0 : -1}
+            tabindex={index === 0}
         ></ohae-tab-button>
+        <!-- tabindex={index === activeTabIndex ? 0 : -1} -->
     {/each}
 </div>
-<div class="slot default body {className || ''}" role="presentation">
+<div class="slot default body {className}" role="presentation">
     <slot></slot>
 </div>
 
@@ -164,7 +146,7 @@
         display: flex;
         flex-direction: column;
         border-radius: 3px;
-        overflow: auto; /* Позволяет контенту внутри body скроллиться, если он больше */
+        overflow: auto;
         height: auto;
         width: auto;
         flex-grow: 1;
@@ -173,85 +155,51 @@
     }
     .header {
         display: flex;
-        /* height: 28px;  Убрано, чтобы высота подстраивалась под контент, особенно для боковых табов */
-        justify-content: flex-start; /* Изменено с space-between для лучшего вида при скролле */
-        padding: 0px;
-        margin: 0px;
+        height: 28px;
+        justify-content: space-between;
+        padding: 0px 0px;
+        /* margin: 0px 10px; */
+        margin: 0px 0px;
         cursor: pointer;
         font-weight: 500;
-        position: relative; /* Для возможного позиционирования элементов внутри */
-
-        /* Стили для скрытия нативного скроллбара, но сохранения функциональности */
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none;  /* Internet Explorer 10+ */
     }
     .header::-webkit-scrollbar {
         display: none; /* Safari and Chrome */
     }
-
     :host {
         display: flex;
         box-sizing: border-box;
         background-color: var(--host-background, transparent);
         padding: 0px;
         margin: 0px;
-        overflow: hidden; /* Важно! Чтобы :host не скроллился, а скроллились его части */
+        overflow: auto;
         height: auto;
         width: auto;
         flex-grow: 1;
     }
-
     :host([tabs-side="top"]) {
         flex-direction: column;
     }
-    :host([tabs-side="top"]) .header {
-        height: 28px; /* Возвращаем фиксированную высоту для горизонтальных табов */
-        margin: -1px 10px;
-        overflow-x: auto; /* Включаем горизонтальный скролл */
-        overflow-y: hidden;
-        flex-wrap: nowrap; /* Предотвращаем перенос кнопок на новую строку */
-    }
-
     :host([tabs-side="bottom"]) {
         flex-direction: column-reverse;
     }
-    :host([tabs-side="bottom"]) .header {
-        height: 28px; /* Возвращаем фиксированную высоту для горизонтальных табов */
-        margin: 1px 10px;
-        overflow-x: auto; /* Включаем горизонтальный скролл */
-        overflow-y: hidden;
-        flex-wrap: nowrap; /* Предотвращаем перенос кнопок на новую строку */
-    }
-
     :host([tabs-side="left"]) {
         flex-direction: row;
     }
-    :host([tabs-side="left"]) .header {
-        margin: 3px 0px;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: flex-start; /* Изменено с end для стандартного вида */
-        overflow-y: auto; /* Включаем вертикальный скролл */
-        overflow-x: hidden;
-        /* Для боковых табов ширина должна быть по контенту или фиксированной */
-        /* width: max-content; или задать фиксированную ширину для .header */
-    }
-
     :host([tabs-side="right"]) {
         flex-direction: row-reverse;
     }
+    :host([tabs-side="top"]) .header {
+        margin: -1px 10px;
+    }
+    :host([tabs-side="bottom"]) .header {
+        margin: 1px 10px;
+    }
+    :host([tabs-side="left"]) .header,
     :host([tabs-side="right"]) .header {
         margin: 3px 0px;
         flex-direction: column;
-        justify-content: flex-start;
-        align-items: flex-start; /* Изменено с end для стандартного вида */
-        overflow-y: auto; /* Включаем вертикальный скролл */
-        overflow-x: hidden;
-        /* width: max-content; */
-    }
-
-    /* Дополнительные стили для кнопок табов, чтобы они не сжимались */
-    .header > ohae-tab-button {
-        flex-shrink: 0;
+        justify-content: flex-end;
+        align-items: start;
     }
 </style>

@@ -1,5 +1,4 @@
-import { onMount } from "svelte";
-import { alignItemsMap, justifyContentMap, type ICalculatedLayoutStyles, type ILayoutSizeProps, type ILayoutStyleProps, type TFlexDirection } from "./OhaeViewOptions";
+import { alignItemsMap, justifyContentMap, type ICalculatedLayoutStyles, type ILayoutSizeProps, type ILayoutStyleProps, type TFlexDirection } from "../components/lauout/OhaeLayoutTypes";
 
 function formatSpacingValue(value: number | string | undefined): string | undefined {
     if (value === undefined) return undefined;
@@ -66,29 +65,30 @@ export function determineResizerDirection(host: HTMLElement | undefined): TFlexD
         }
     }
     console.warn(">>>", 6, null);
-    return null; // Не удалось определить
+    return null;
 }
 
-// export function asignLayoutProps(getShadowRoot: () => ShadowRoot | null, sizeProps: ILayoutSizeProps): void {
-export function asignLayoutProps(getHost: () => HTMLElement | null, sizeProps: ILayoutSizeProps): void {
-    onMount(() => {
+// function $host<El extends HTMLElement = HTMLElement>(): El
+type THost = <El extends HTMLElement = HTMLElement>() => El;
+
+
+
+export function asignLayoutProps(getHost: THost, options: ILayoutSizeProps): void {
     const host = getHost();
     if(!host) return;
     const style = host.style;
 
     // if(sizeProps.width) style.width = sizeProps.width.toString();
     // if(sizeProps.height) style.height = sizeProps.height.toString();
-    if(sizeProps.maxWidth) style.maxWidth = sizeProps.maxWidth.toString()+'px';
-    if(sizeProps.maxHeight) style.maxHeight = sizeProps.maxHeight.toString()+'px';
-    if(sizeProps.minWidth) style.minWidth = sizeProps.minWidth.toString()+'px';
-    if(sizeProps.minHeight) style.minHeight = sizeProps.minHeight.toString()+'px';
+    style.maxWidth = options.maxWidth ? options.maxWidth.toString()+'px' : '';
+    style.maxHeight = options.maxHeight ? options.maxHeight.toString()+'px' : '';
+    style.minWidth = options.minWidth ? options.minWidth.toString()+'px' : '';
+    style.minHeight = options.minHeight ? options.minHeight.toString()+'px' : '';
 
-    
-    if(sizeProps.flex) style.flexGrow = sizeProps.flex.toString();
-    style.display = getDisplayValue(sizeProps.collapsed);
-    
-    if(sizeProps.overflow) style.overflow = sizeProps.overflow;
-    if(sizeProps.overflowX) style.overflowX = sizeProps.overflowX;
-    if(sizeProps.overflowY) style.overflowY = sizeProps.overflowY;
-  });
+    style.flexGrow = options.flex ? options.flex.toString() : '';
+    style.display = getDisplayValue(options.collapsed);
+
+    style.overflow = options.overflow ? options.overflow.toString() : '';
+    style.overflowX = options.overflowX ? options.overflowX.toString() : '';
+    style.overflowY = options.overflowY ? options.overflowY.toString() : '';
 }

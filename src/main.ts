@@ -6,9 +6,10 @@ import './components/lauout/OhaeLayoutView.svelte';
 import './components/lauout/OhaeResizerView.svelte';
 import './components/lauout/OhaeSeparatorView.svelte';
 import './components/icons/OhaeIconOfTypeView.svelte';
-// import './components/tabs/OhaeTabItemView.svelte';
-// import './components/tabs/OhaeTabItemButton.svelte';
-// import './components/tabs/OhaeTabsView.svelte';
+import './components/tabs/OhaeTabsView.svelte';
+import './components/tabs/OhaeTabItemView.svelte';
+import './components/tabs/OhaeTabButtonView.svelte';
+
 
 // 2. Импортируйте вашу конфигурацию и функцию рендеринга
 import { mainViewConfig } from './ui-configs/mainViewConfig.js';

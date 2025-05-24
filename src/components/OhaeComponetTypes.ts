@@ -2,7 +2,7 @@ import type { IOhaeIconOfTypeConfig } from "./icons/OhaeIconOfTypeTypes";
 import type { IOhaeLayoutConfig } from "./lauout/OhaeLayoutTypes";
 import type { IOhaeResizerConfig } from "./lauout/OhaeResizerTypes";
 import type { IOhaeSeparatorConfig } from "./lauout/OhaeSeparatorTypes";
-import type { IOhaeTabConfig, IOhaeTabItemConfig } from "./tabs/OhaeTabsTypes";
+import type { IOhaeTabsConfig as IOhaeTabsConfig, IOhaeTabItemConfig } from "./tabs/OhaeTabsTypes";
 
 export interface IOhaeBaseComponentConfig {
     id?: string;
@@ -19,7 +19,7 @@ export type IUiNodeConfig =
   | IOhaeIconOfTypeConfig
   | IOhaeSeparatorConfig
   | IOhaeResizerConfig
-  | IOhaeTabConfig
+  | IOhaeTabsConfig
   | IOhaeTabItemConfig
   | IOhaeBaseComponentConfig; // Общий тип для простых элементов вроде 'div' или как fallback
 

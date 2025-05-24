@@ -102,7 +102,7 @@ export const bodyViewConfig: UiNodeConfig = {
             direction: 'row',
             overflow: 'auto',
             className: 'right',
-            maxWidth: 50,
+            maxWidth: 100,
             minWidth: 50,
             body: [
                 { view: 'div', body: 'minHeight: 0' },
@@ -115,6 +115,10 @@ export const bodyViewConfig: UiNodeConfig = {
             direction: 'row',
             overflow: 'auto',
             className: 'right',
+            backgroundColor: "#222222",
+            minWidth: 30,
+            // maxWidth: 500,
+            padding: 0,
             body: tabsViewConfig
             // body: [
             //     { view: 'div', body: 'minHeight: 0' },

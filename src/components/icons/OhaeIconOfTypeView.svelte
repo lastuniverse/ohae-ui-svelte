@@ -2,11 +2,14 @@
 
 <script lang="ts">
     import { asignLayoutProps, calculateLayoutStyles } from "../../lib/layoutUtils";
-    import { useShadowTheme } from "../../lib/useShadowTheme";
+    import { initOhae } from "../../lib/ohaeUtils";
     import type { IconTypeDefinition, IOhaeIconOfTypeConfig } from "./OhaeIconOfTypeTypes";
 
-    // Тип для данных иконки, передаваемых через пропс `types`
-
+    initOhae($host(), {
+        modifyAppendChild: true,
+        loadOhaeTheme: true,
+        loadFontsAwesome: true,
+    });
 
     let {
         size = 12,
@@ -29,14 +32,14 @@
         }),
     );
 
-    asignLayoutProps(() => $host(), {
-        maxWidth: size,
-        maxHeight: size,
-        minWidth: size,
-        minHeight: size,
+    $effect(()=>{
+        asignLayoutProps(() => $host(), {
+            maxWidth: size,
+            maxHeight: size,
+            minWidth: size,
+            minHeight: size,
+        });        
     });
-
-    useShadowTheme(() => $host().shadowRoot);
 
     function getIconClasses(iconData?: IconTypeDefinition) {
         let icon =
@@ -50,7 +53,7 @@
 </script>
 
 <div
-    class="slot icon-container {className}"
+    class="slot default {className}"
     style:align-items={calculatedStyles.finalAlignItems}
     style:vertical-align={calculatedStyles.finalAlignItems}
     style:justify-content={calculatedStyles.finalJustifyContent}
@@ -65,7 +68,7 @@
 </div>
 
 <style>
-    .icon-container {
+    .default {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
@@ -74,7 +77,7 @@
         align-items: center;
         justify-content: center;
     }
-    .icon-container:hover .icon-fa-style {
+    .default:hover .icon-fa-style {
         opacity: 0.8;
     }
 

@@ -2,11 +2,18 @@
 
 <script lang="ts">
     import { determineResizerDirection } from "../../lib/layoutUtils";
-    import { useShadowTheme } from "../../lib/useShadowTheme";
+    import { initOhae } from "../../lib/ohaeUtils";
     import type { TFlexDirection } from "./OhaeLayoutTypes";
     import type { IOhaeSeparatorConfig } from "./OhaeSeparatorTypes";
 
     export const resizeDeny: boolean = true;
+
+    initOhae($host(), {
+        modifyAppendChild: true,
+        loadFontsAwesome: false,
+        loadOhaeTheme: true,
+    });
+
     let { 
         size = 1,
         className = undefined
@@ -16,11 +23,10 @@
         determineResizerDirection($host()),
     ) as TFlexDirection;
 
-    useShadowTheme(() => $host().shadowRoot);
 </script>
 
 <div
-    class="slot separator {className}"
+    class="slot default {className}"
     class:cols={direction === "column"}
     class:rows={direction === "row"}
     style:width={direction === "column" ? size + "px" : "100%"}
@@ -30,11 +36,13 @@
     style:min-height={direction === "row" ? size + "px" : undefined}
     style:max-height={direction === "row" ? size + "px" : undefined}
     role="separator"
-></div>
+>
+    <slot></slot>
+</div>
 
 <style>
     :host,
-    .separator {
+    .default {
         box-sizing: border-box;
         border: none;
         padding: 0;
@@ -45,7 +53,7 @@
         padding: 0px;
     }
 
-    .separator {
+    .default {
         display: flex;
         position: relative;
         user-select: none;

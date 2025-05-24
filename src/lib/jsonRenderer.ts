@@ -1,4 +1,5 @@
-import type { IUiNodeConfig, UiNodeChildConfig, UiNodeConfig } from "../components/OhaeComponetTypes";
+import type { IUiNodeConfig, UiNodeConfig } from "../components/OhaeComponetTypes";
+import type { HTMLOhaeElement } from "./ohaeUtils";
 
 const tagsMap: Record<string, string> = {
   layout: 'ohae-layout',
@@ -7,6 +8,7 @@ const tagsMap: Record<string, string> = {
   icon: 'ohae-icon-of-type',
   tabs: 'ohae-tabs',
   'tab-item': 'ohae-tab-item',
+  // 'tab-item': 'ohae-layout',
   'tab-button': 'ohae-tab-button',
 };
 
@@ -17,7 +19,7 @@ export async function createUI(config: UiNodeConfig, parentElement: HTMLElement)
   }
   return new Promise((resolve, reject) => {
     requestAnimationFrame(async () => {
-      const slotContainer = parentElement.shadowRoot?.querySelector('.slot') as HTMLElement ?? parentElement.querySelector('.slot') as HTMLElement ?? parentElement;
+      const slotContainer = parentElement;//.shadowRoot?.querySelector('.slot') as HTMLElement ?? parentElement.querySelector('.slot') as HTMLElement ?? parentElement;
       const element = createUiElement(config, slotContainer)
       if(element) {
         resolve(element)
@@ -33,17 +35,12 @@ function createUiElement(config: UiNodeConfig, parentElement: HTMLElement): HTML
   if (typeof config === 'object') {
     return renderElementFromJson(config, parentElement);
   } else {
-    return renterElementFromText(config, parentElement);
+    return renderElementFromText(config, parentElement);
   }
 }
 
-function renderElementFromJson(config: IUiNodeConfig, parentElement: HTMLElement): HTMLElement | null {
-  if (!config.view) {
-    console.error("Invalid config or missing view:", config);
-    return null;
-  }
-
-  const tagName = tagsMap[config.view] ?? config.view;
+function renderElementFromJson(config: IUiNodeConfig, parentElement: HTMLElement | HTMLOhaeElement): HTMLElement | null {
+  const tagName = tagsMap[config.view ?? "template"] ?? config.view ?? "div";
   
   const element = document.createElement(tagName);
   if(!element) {
@@ -53,11 +50,10 @@ function renderElementFromJson(config: IUiNodeConfig, parentElement: HTMLElement
 
 
   setPropsAndAttributes(element, config);
+
   parentElement.appendChild(element);
-  
 
   if (config.body) {
-    // const slotContainer = element.shadowRoot?.querySelector('.slot') as HTMLElement ?? element.querySelector('.slot') as HTMLElement ?? element;
     if (Array.isArray(config.body)) {
       (config.body as UiNodeConfig[]).forEach((configChild: UiNodeConfig) => {
         createUI(configChild, element);
@@ -71,7 +67,7 @@ function renderElementFromJson(config: IUiNodeConfig, parentElement: HTMLElement
 }
 
 
-function renterElementFromText(text: string | number, parentElement: HTMLElement): Text | null {
+function renderElementFromText(text: string | number, parentElement: HTMLElement | HTMLOhaeElement): Text | null {
   if (text.toString().length === 0) {
     console.error("Invalid ctreate Text element for empty string");
     return null;
@@ -96,6 +92,7 @@ function setPropsAndAttributes(element: HTMLElement, config: IUiNodeConfig) {
       if (typeof value === 'string') element.setAttribute('style', value);
     } else if (key in element) {
       (element as any)[key] = value;
+      element.setAttribute(camelToKebab(key), String(value));
     } else if (typeof value === 'object'){
         (element as any)[key] = value;
     } else if (typeof value === 'boolean'){

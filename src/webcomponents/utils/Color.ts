@@ -30,7 +30,7 @@ export class Color implements IRgba {
     /** Парсинг цвета из строкового представления */
     static parse(color: UnknowColor): IRgba {
         if (!color) {
-            return { r: 0, g: 0, b: 0, a: 0 };
+            return { r: 0, g: 0, b: 0, a: 1 };
         }
 
         if (typeof color !== 'string') {
@@ -43,8 +43,10 @@ export class Color implements IRgba {
         let hexMatch = color.match(/^#([0-9a-f]{3,8})$/i);
         if (hexMatch) {
             let hex = hexMatch[1];
+
             if (hex.length === 3) hex = hex.split("").map(x => x + x).join("");
             if (hex.length === 4) hex = hex.split("").map(x => x + x).join("");
+
             if (hex.length === 6 || hex.length === 8) {
                 const r = parseInt(hex.substring(0, 2), 16);
                 const g = parseInt(hex.substring(2, 4), 16);
@@ -180,10 +182,6 @@ export class Color implements IRgba {
         return middle;
     }
 
-    get isBrightness(): boolean {
-        return this.middle>127;
-    }
-
 
     /** Изменение оттенка (Hue) */
     hue(degrees: number): Color {
@@ -217,6 +215,16 @@ export class Color implements IRgba {
     }
 
     /** Изменение яркости (сдвиг цвета) */
+    shift(factor: number): Color {
+        let rgba = this.getRgba();
+        rgba.r = (rgba.r + factor + 256) % 256;
+        rgba.g = (rgba.g + factor + 256) % 256;
+        rgba.b = (rgba.b + factor + 256) % 256;
+        const color = new Color(rgba);
+        return color;
+    }
+
+    /** Изменение яркости (сдвиг цвета) */
     mono(): Color {
         let rgba = this.getRgba();
         const middle = this.middle;
@@ -235,27 +243,13 @@ export class Color implements IRgba {
     }
 
 
-    /** Изменение яркости (сдвиг цвета) */
-    shift(factor: number): Color {
-        let rgba = this.getRgba();
-        let size = 255 * factor;
-        // rgba.r = (rgba.r + size + 256) % 256;
-        // rgba.g = (rgba.g + size + 256) % 256;
-        // rgba.b = (rgba.b + size + 256) % 256;
-        rgba.r = Math.floor(Math.min(255, Math.max(1, rgba.r + size)));
-        rgba.g = Math.floor(Math.min(255, Math.max(1, rgba.g + size)));
-        rgba.b = Math.floor(Math.min(255, Math.max(1, rgba.b + size)));
-        const color = new Color(rgba);
-        return color;
-    }
-
     contrast(factor: number): Color {
         let rgba = this.getRgba();
         let size = 255 * factor;
-        if (this.isBrightness) size = -size
-        rgba.r = Math.floor(Math.min(255, Math.max(1, rgba.r + size)));
-        rgba.g = Math.floor(Math.min(255, Math.max(1, rgba.g + size)));
-        rgba.b = Math.floor(Math.min(255, Math.max(1, rgba.b + size)));
+        if (this.middle >= 128) size = -size
+        rgba.r = Math.min(255, Math.max(1, rgba.r + size));
+        rgba.g = Math.min(255, Math.max(1, rgba.g + size));
+        rgba.b = Math.min(255, Math.max(1, rgba.b + size));
         const color = new Color(rgba);
         return color;
     }
