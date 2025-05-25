@@ -1,5 +1,5 @@
 import type { UiNodeConfig } from "../components/OhaeComponetTypes";
-import { tabsViewConfig } from "./tabsViewConfig";
+import { tabsViewConfig, tabsViewConfigTop } from "./tabsViewConfig";
 
 export const bodyViewConfig: UiNodeConfig = {
     view: 'layout',
@@ -96,7 +96,7 @@ export const bodyViewConfig: UiNodeConfig = {
                 }
             ]
         },
-        { view: 'resizer' },
+        { view: 'separator', size: 1 },
         {
             view: 'layout',
             direction: 'row',
@@ -109,21 +109,34 @@ export const bodyViewConfig: UiNodeConfig = {
                 { view: 'div', body: 'maxHeight: undefined' }
             ]
         },
-        { view: 'separator', size: 1 },
+        { view: 'resizer' },
         {
             view: 'layout',
-            direction: 'row',
+            direction: 'column',
             overflow: 'auto',
             className: 'right',
             backgroundColor: "#222222",
             minWidth: 30,
             // maxWidth: 500,
             padding: 0,
-            body: tabsViewConfig
-            // body: [
-            //     { view: 'div', body: 'minHeight: 0' },
-            //     { view: 'div', body: 'maxHeight: undefined' }
-            // ]
+            body: [
+                tabsViewConfigTop,
+                {view: 'resizer'},
+                tabsViewConfig,
+                {
+                    view: "layout",
+                    direction: 'column',
+                    minHeight: 26,
+                    body: tabsViewConfigTop
+                },
+                {view: 'resizer'},
+                {
+                    view: 'layout',
+                    direction: 'column',
+                    minWidth: 30,
+                    body: tabsViewConfig
+                }
+            ]
         }
     ]
 };

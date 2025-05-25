@@ -166,6 +166,7 @@
     .header::-webkit-scrollbar {
         display: none; /* Safari and Chrome */
     }
+
     :host {
         display: flex;
         box-sizing: border-box;

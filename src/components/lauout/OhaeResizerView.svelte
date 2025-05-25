@@ -87,17 +87,16 @@
     }
 
     function logElementsSizes(): void {
-        return;
-        console.log("===========================");
-        const children = getResizedElemens();
-        children.forEach((element) => {
-            const flexSize = getElementSize(element);
-            const size = isRowDirection
-                ? element.offsetHeight
-                : element.offsetWidth;
-            console.log(element.tagName, "size", size, flexSize);
-        });
-        console.log("---------------------------");
+        // console.log("===========================");
+        // const children = getResizedElemens();
+        // children.forEach((element) => {
+        //     const flexSize = getElementSize(element);
+        //     const size = isRowDirection
+        //         ? element.offsetHeight
+        //         : element.offsetWidth;
+        //     console.log(element.tagName, "size", size, flexSize);
+        // });
+        // console.log("---------------------------");
     }
 
     function storeElements(): void {
@@ -207,13 +206,24 @@
     }
 
     function getMouseDelta(event: MouseEvent | TouchEvent): number {
-        let clientX: number, clientY: number;
+        // let clientX: number, clientY: number;
+        // if (event instanceof TouchEvent) {
+        //     // Берём первый палец (обычно этого достаточно)
+        //     clientX = event.touches[0]?.clientX ?? 0;
+        //     clientY = event.touches[0]?.clientY ?? 0;
+        // } else {
+        //     clientX = event.clientX;
+        //     clientY = event.clientY;
+        // }
 
-        if (event instanceof TouchEvent) {
+        let clientX = 0;
+        let clientY = 0;
+
+        if (typeof TouchEvent !== 'undefined' && event instanceof TouchEvent) {
             // Берём первый палец (обычно этого достаточно)
             clientX = event.touches[0]?.clientX ?? 0;
             clientY = event.touches[0]?.clientY ?? 0;
-        } else {
+        } else if (typeof MouseEvent !== 'undefined' && event instanceof MouseEvent) {
             clientX = event.clientX;
             clientY = event.clientY;
         }
@@ -329,13 +339,13 @@
         box-sizing: border-box;
         /* background-color: transparent; */
         border: none;
-        padding: 0;
-        margin: 0;
+        padding: 0px;
+        margin: 0px;
     }
 
     :host {
         /* flex: 0 0 4px; */
-        padding: 0px;
+        padding: 1px;
     }
 
     .default {

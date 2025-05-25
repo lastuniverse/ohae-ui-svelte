@@ -1,6 +1,6 @@
 import { alignItemsMap, justifyContentMap, type ICalculatedLayoutStyles, type ILayoutSizeProps, type ILayoutStyleProps, type TFlexDirection } from "../components/lauout/OhaeLayoutTypes";
 
-function formatSpacingValue(value: number | string | undefined): string | undefined {
+export function formatSpacingValue(value: number | string | undefined): string | undefined {
     if (value === undefined) return undefined;
     if (typeof value === 'number') return `${value}px`;
     return String(value); // Позволяет передавать строки типа "1em", "5px 10px", и т.д.
@@ -80,15 +80,15 @@ export function asignLayoutProps(getHost: THost, options: ILayoutSizeProps): voi
 
     // if(sizeProps.width) style.width = sizeProps.width.toString();
     // if(sizeProps.height) style.height = sizeProps.height.toString();
-    style.maxWidth = options.maxWidth ? options.maxWidth.toString()+'px' : '';
-    style.maxHeight = options.maxHeight ? options.maxHeight.toString()+'px' : '';
-    style.minWidth = options.minWidth ? options.minWidth.toString()+'px' : '';
-    style.minHeight = options.minHeight ? options.minHeight.toString()+'px' : '';
+    if(options.maxWidth!==undefined) style.maxWidth = options.maxWidth.toString()+'px';
+    if(options.maxHeight!==undefined) style.maxHeight = options.maxHeight.toString()+'px';
+    if(options.minWidth!==undefined) style.minWidth = options.minWidth.toString()+'px';
+    if(options.minHeight!==undefined) style.minHeight = options.minHeight.toString()+'px';
 
-    style.flexGrow = options.flex ? options.flex.toString() : '';
+    if(options.flex!==undefined) style.flexGrow = options.flex.toString();
     style.display = getDisplayValue(options.collapsed);
 
-    style.overflow = options.overflow ? options.overflow.toString() : '';
-    style.overflowX = options.overflowX ? options.overflowX.toString() : '';
-    style.overflowY = options.overflowY ? options.overflowY.toString() : '';
+    if(options.overflow!==undefined) style.overflow = options.overflow.toString();
+    if(options.overflowX!==undefined) style.overflowX = options.overflowX.toString();
+    if(options.overflowY!==undefined) style.overflowY = options.overflowY.toString();
 }

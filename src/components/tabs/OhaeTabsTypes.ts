@@ -1,6 +1,7 @@
 import OhaeTabItemView from "./OhaeTabItemView.svelte";
-import type { ILayoutSizeProps, ILayoutStyleProps, IOhaeLayoutConfig } from "../lauout/OhaeLayoutTypes";
+import type { ILayoutSizeProps, ILayoutStyleProps } from "../lauout/OhaeLayoutTypes";
 import type { IOhaeBaseComponentConfig } from "../OhaeComponetTypes";
+import type { Color } from "../../lib/Color";
 
 export const TabFlexDirectionContentMap = {
     top: "column",
@@ -19,13 +20,23 @@ export interface TabDataItem {
     icon?: string;
     tabItemElement: OhaeTabItemView;
     backgroundColor?: string;
+    color: Color
 };
 
-export interface IOhaeTabsConfig extends IOhaeBaseComponentConfig {
+export interface IOhaeTabsConfig extends IOhaeBaseComponentConfig, ILayoutStyleProps, ILayoutSizeProps, IOhaeBaseComponentConfig {
     view: 'tabs';
     tabsSide?: TabButtonSide;
     bodyBgColor?: string;
     tabsBgColor?: string;
+
+    // flex?: number;
+    // maxWidth?: number;
+    // maxHeight?: number;
+    // minWidth?: number;
+    // minHeight?: number;
+    // collapsed?: boolean;
+    // padding?: number;
+    // margin?: number;
 }
 
 export interface IOhaeTabItemConfig extends ILayoutStyleProps, ILayoutSizeProps, IOhaeBaseComponentConfig {

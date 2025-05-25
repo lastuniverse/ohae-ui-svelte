@@ -5,7 +5,7 @@
 <script lang="ts">
     import { calculateLayoutStyles } from "../../lib/layoutUtils";
     import type { TFlexDirection } from "../lauout/OhaeLayoutTypes";
-    import { initOhae } from "../../lib/ohaeUtils";
+    import { assignColors, initOhae } from "../../lib/ohaeUtils";
     import type { IOhaeTabItemConfig } from "./OhaeTabsTypes";
 
     initOhae($host(), {
@@ -41,8 +41,13 @@
 
     $effect(() => {
         $host().style.display = collapsed ? 'none' : 'flex';
+        assignColors($host(), {
+            "--body": "backgroundColor",
+        });        
     });
 </script>
+
+<!-- style:background-color={backgroundColor} -->
 
 <div
     class="slot default {className}"
@@ -51,7 +56,6 @@
     style:justify-content={calculatedStyles.finalJustifyContent}
     style:padding={calculatedStyles.paddingStyle}
     style:margin={calculatedStyles.marginStyle}
-    style:background-color={backgroundColor}
     style={customStyle}
     role=""
 >
@@ -72,7 +76,9 @@
         overflow: auto;
         border-radius: 3px;
         width: 100%;
+        /* height: auto; */
         /* border: 1px solid red; */
+        background-color: var(--body-background);
     }
 
     .default {

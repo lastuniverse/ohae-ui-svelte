@@ -5,6 +5,8 @@
     import { assignColors, initOhae } from "../../lib/ohaeUtils";
     import { appendChildToSlot } from "../../lib/slotsUtils";
     import OhaeTabItemView from "./OhaeTabItemView.svelte";
+    import { Color } from "../../lib/Color";
+    import { asignLayoutProps } from "../../lib/layoutUtils";
 
     type TOhaeTabItemView = HTMLElement & OhaeTabItemView;
 
@@ -25,22 +27,36 @@
     }
 
     let {
+        flex = 1,
+        collapsed = false,
+        maxWidth = undefined,
+        maxHeight = undefined,
+        minWidth = undefined,
+        minHeight = undefined,
+
         tabsSide = "top" as TabButtonSide,
         bodyBgColor = undefined,
-        tabsBgColor = undefined,
+        tabsBgColor = "#444",
         className = undefined,
     }: IOhaeTabsConfig = $props();
 
     $effect(() => {
+        asignLayoutProps(()=>$host(), {
+            flex,
+            maxWidth,
+            maxHeight,
+            minWidth,
+            minHeight,
+            collapsed,
+        }); 
+               
         assignColors($host(), {
             "--host": "bodyBgColor",
-            // "--head": "tabsBgColor", // Если нужно, чтобы фон хедера тоже менялся
         });
     });
 
     let tabsData = $state<TabDataItem[]>([]);
     let activeTabIndex = $state<number>(0);
-
     function initTab(node?: Node) {
         if (!isOhaeTabItem(node)) return null;
         const id =
@@ -52,7 +68,8 @@
             id,
             header: node.header || "unamed",
             icon: node.icon || "fa-play",
-            backgroundColor: node.backgroundColor,
+            // backgroundColor: node.backgroundColor,
+            color: new Color(node.backgroundColor),
             tabItemElement: node,
         });
         // Если это первый добавленный таб, сделать его активным
@@ -82,31 +99,22 @@
         // Предотвращаем прокрутку всей страницы, если мы внутри хедера
         event.preventDefault();
 
+        const scrollSpeed = 0.2;
         let scrollAmount = 0;
         // Для большинства мышей deltaY отвечает за вертикальную прокрутку колеса.
         // deltaX используется для горизонтальной прокрутки (например, на тачпадах или спец. мышах).
         // Мы хотим, чтобы вертикальное колесо прокручивало горизонтальные табы,
         // и вертикальное колесо прокручивало вертикальные табы.
-
         if (tabsSide === "top" || tabsSide === "bottom") {
-            // Горизонтальная прокрутка табов
-            // Если есть deltaX (например, тачпад или мышь с горизонтальным колесом), используем его.
-            // Иначе, используем deltaY (стандартное колесо мыши).
             if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-                scrollAmount = event.deltaX;
+                scrollAmount = event.deltaX*scrollSpeed;
             } else {
-                scrollAmount = event.deltaY;
+                scrollAmount = event.deltaY*scrollSpeed;
             }
             headerElement.scrollLeft += scrollAmount;
         } else { // tabsSide === "left" || tabsSide === "right"
-            // Вертикальная прокрутка табов
-            // Здесь обычно deltaY является основным, но deltaX тоже может влиять (например, на тачпадах)
-            // Для простоты используем deltaY, т.к. headerElement.scrollTop ожидает вертикальный сдвиг.
-            scrollAmount = event.deltaY;
-            // Если хотите, чтобы горизонтальный скролл тачпада тоже влиял:
-            // if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-            //     scrollAmount = event.deltaX; // Это может быть нелогично для вертикальных табов, но возможно для тачпадов
-            // }
+            scrollAmount = event.deltaY*scrollSpeed;
+  
             headerElement.scrollTop += scrollAmount;
         }
     }
@@ -114,14 +122,11 @@
     function handleTabsScroollWithKeyboard(e: KeyboardEvent, index: number){
         // Базовая навигация стрелками
         let newIndex = index;
-        const isHorizontal = tabsSide === 'top' || tabsSide === 'bottom';
-        if (isHorizontal) {
-            if (e.key === 'ArrowLeft') newIndex--;
-            else if (e.key === 'ArrowRight') newIndex++;
-        } else {
-            if (e.key === 'ArrowUp') newIndex--;
-            else if (e.key === 'ArrowDown') newIndex++;
-        }
+
+        if (e.key === 'ArrowLeft') newIndex--;
+        else if (e.key === 'ArrowRight') newIndex++;
+        else if (e.key === 'ArrowUp') newIndex--;
+        else if (e.key === 'ArrowDown') newIndex++;
 
         if (newIndex !== index && newIndex >= 0 && newIndex < tabsData.length) {
             e.preventDefault();
@@ -144,7 +149,7 @@
             icon={item.icon}
             side={tabsSide}
             current={index === activeTabIndex}
-            backgroundColor={item.backgroundColor}
+            backgroundColor={item.color.shift(-0.05).hex}
             onclick={() => showTab(index)}
             onkeydown={(e: KeyboardEvent) => handleTabsScroollWithKeyboard(e, index)}
             aria-controls={item.id}
@@ -155,7 +160,10 @@
         ></ohae-tab-button>
     {/each}
 </div>
-<div class="slot default body {className || ''}" role="presentation">
+<div 
+    class="slot default body {className || ''}" 
+    role="presentation"
+>
     <slot></slot>
 </div>
 
@@ -164,7 +172,7 @@
         display: flex;
         flex-direction: column;
         border-radius: 3px;
-        overflow: auto; /* Позволяет контенту внутри body скроллиться, если он больше */
+        overflow: auto;
         height: auto;
         width: auto;
         flex-grow: 1;
@@ -173,15 +181,15 @@
     }
     .header {
         display: flex;
-        /* height: 28px;  Убрано, чтобы высота подстраивалась под контент, особенно для боковых табов */
-        justify-content: flex-start; /* Изменено с space-between для лучшего вида при скролле */
+        justify-content: space-between; /* flex-start Изменено с space-between для лучшего вида при скролле */
         padding: 0px;
         margin: 0px;
         cursor: pointer;
         font-weight: 500;
-        position: relative; /* Для возможного позиционирования элементов внутри */
+    }
 
-        /* Стили для скрытия нативного скроллбара, но сохранения функциональности */
+    /* Стили для скрытия нативного скроллбара, но сохранения функциональности */
+    .header {
         scrollbar-width: none; /* Firefox */
         -ms-overflow-style: none;  /* Internet Explorer 10+ */
     }
@@ -192,35 +200,39 @@
     :host {
         display: flex;
         box-sizing: border-box;
+        border: none;
+        border-radius: 3px;
         background-color: var(--host-background, transparent);
         padding: 0px;
         margin: 0px;
-        overflow: hidden; /* Важно! Чтобы :host не скроллился, а скроллились его части */
-        height: auto;
+        flex: 1 1 0;
+        /* width: 100%; */
         width: auto;
-        flex-grow: 1;
+        height: auto;
+        /* Важно! Чтобы :host не скроллился, а скроллились его части */
+        overflow: hidden;
     }
 
     :host([tabs-side="top"]) {
         flex-direction: column;
     }
     :host([tabs-side="top"]) .header {
-        height: 28px; /* Возвращаем фиксированную высоту для горизонтальных табов */
-        margin: -1px 10px;
-        overflow-x: auto; /* Включаем горизонтальный скролл */
+        height: 28px;
+        margin: -1px 3px;
+        overflow-x: auto;
         overflow-y: hidden;
-        flex-wrap: nowrap; /* Предотвращаем перенос кнопок на новую строку */
+        flex-wrap: nowrap;
     }
 
     :host([tabs-side="bottom"]) {
         flex-direction: column-reverse;
     }
     :host([tabs-side="bottom"]) .header {
-        height: 28px; /* Возвращаем фиксированную высоту для горизонтальных табов */
-        margin: 1px 10px;
-        overflow-x: auto; /* Включаем горизонтальный скролл */
+        height: 28px;
+        margin: 1px 3px;
+        overflow-x: auto;
         overflow-y: hidden;
-        flex-wrap: nowrap; /* Предотвращаем перенос кнопок на новую строку */
+        flex-wrap: nowrap;
     }
 
     :host([tabs-side="left"]) {
@@ -229,12 +241,11 @@
     :host([tabs-side="left"]) .header {
         margin: 3px 0px;
         flex-direction: column;
+
         justify-content: flex-start;
-        align-items: flex-start; /* Изменено с end для стандартного вида */
-        overflow-y: auto; /* Включаем вертикальный скролл */
+        align-items: flex-start;
+        overflow-y: auto;
         overflow-x: hidden;
-        /* Для боковых табов ширина должна быть по контенту или фиксированной */
-        /* width: max-content; или задать фиксированную ширину для .header */
     }
 
     :host([tabs-side="right"]) {
@@ -244,14 +255,14 @@
         margin: 3px 0px;
         flex-direction: column;
         justify-content: flex-start;
-        align-items: flex-start; /* Изменено с end для стандартного вида */
-        overflow-y: auto; /* Включаем вертикальный скролл */
+        align-items: flex-start;
+        overflow-y: auto;
         overflow-x: hidden;
-        /* width: max-content; */
     }
 
-    /* Дополнительные стили для кнопок табов, чтобы они не сжимались */
+    .header,
     .header > ohae-tab-button {
         flex-shrink: 0;
+        flex-basis: 30;
     }
 </style>
