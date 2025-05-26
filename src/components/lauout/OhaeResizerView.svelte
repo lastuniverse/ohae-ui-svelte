@@ -23,7 +23,6 @@
     let isDragging = $state(false);
     let direction = $derived( determineResizerDirection($host()) ) as TFlexDirection;
     let isRowDirection: boolean = $derived(direction === "row");
-
     let resizer = new Resizer(()=>$host());
 
     $effect(()=>{

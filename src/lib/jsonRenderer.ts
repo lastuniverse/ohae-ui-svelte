@@ -10,6 +10,7 @@ const tagsMap: Record<string, string> = {
   'tab-item': 'ohae-tab-item',
   // 'tab-item': 'ohae-layout',
   'tab-button': 'ohae-tab-button',
+  'ace-editor': 'ohae-ace-editor',
 };
 
 export async function createUI(config: UiNodeConfig, parentElement: HTMLElement): Promise<HTMLElement|Text|null> {

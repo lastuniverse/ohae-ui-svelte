@@ -42,7 +42,6 @@ export function initOhae(hostNode: HTMLOhaeElement, options: IOhaeIinitOptions =
     if(options.loadFontsAwesome){
         useFontAwesome(() => hostNode.shadowRoot);
     }
-
 }
 
 export function assignColors(hostNode: HTMLOhaeElement, options: Record<string, string>) {

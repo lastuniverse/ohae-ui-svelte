@@ -57,6 +57,7 @@
 
     let tabsData = $state<TabDataItem[]>([]);
     let activeTabIndex = $state<number>(0);
+        
     function initTab(node?: Node) {
         if (!isOhaeTabItem(node)) return null;
         const id =

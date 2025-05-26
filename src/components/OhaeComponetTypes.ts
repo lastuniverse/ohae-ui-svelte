@@ -1,3 +1,4 @@
+import type { IOhaeAceEditorConfig } from "./external/OhaeAceEditorTypes";
 import type { IOhaeIconOfTypeConfig } from "./icons/OhaeIconOfTypeTypes";
 import type { IOhaeLayoutConfig } from "./lauout/OhaeLayoutTypes";
 import type { IOhaeResizerConfig } from "./lauout/OhaeResizerTypes";
@@ -21,6 +22,7 @@ export type IUiNodeConfig =
   | IOhaeResizerConfig
   | IOhaeTabsConfig
   | IOhaeTabItemConfig
+  | IOhaeAceEditorConfig
   | IOhaeBaseComponentConfig; // Общий тип для простых элементов вроде 'div' или как fallback
 
 export type UiNodeConfig =

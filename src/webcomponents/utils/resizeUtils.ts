@@ -173,16 +173,6 @@ export class Resizer {
     }
 
     public getMouseDelta(event: MouseEvent | TouchEvent): number {
-        // let clientX: number, clientY: number;
-        // if (event instanceof TouchEvent) {
-        //     // Берём первый палец (обычно этого достаточно)
-        //     clientX = event.touches[0]?.clientX ?? 0;
-        //     clientY = event.touches[0]?.clientY ?? 0;
-        // } else {
-        //     clientX = event.clientX;
-        //     clientY = event.clientY;
-        // }
-
         let clientX = 0;
         let clientY = 0;
 
@@ -200,7 +190,7 @@ export class Resizer {
         return mouseDelta;
     }
 
-    applyResize(delta: number): void {
+    public applyResize(delta: number): void {
         if (delta === 0) return;
 
         this.currentDragDelta = Math.abs(delta);

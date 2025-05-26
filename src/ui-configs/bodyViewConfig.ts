@@ -13,21 +13,22 @@ export const bodyViewConfig: UiNodeConfig = {
             direction: 'column',
             overflow: 'auto',
             body: [
-                // {
-                //   view: 'layout',
-                //   direction: 'column',
-                //   overflow: 'auto',
-                //   // minHeight: 30,
-                //   className: 'top',
-                //   flex: 1,
-                //   // style: "border: 1px solid red;",
-                //   body: [
-                //     { view: 'div', body: 'minHeight: 0' },
-                //     { view: 'div', body: 'maxHeight: undefined' },
-                //     { view: 'div', body: "111111111111111111111111&nbsp; 222222222222222&nbsp; 33333333333333&nbsp; 444444444444&nbsp; 555555555555&nbsp; 66666666666" },
-                //   ]
-                // },
-                // { view: 'resizer' }, // Предположим, что resizer не принимает дочерние элементы
+                {
+                    view: 'layout',
+                    direction: 'column',
+                    overflow: 'auto',
+                    flex: 1,
+                    body: {
+                        view: 'ace-editor',
+                        theme: 'monokai',
+                        fontSize: 12,
+                        mode: 'typescript',
+                        fileUrl: '/files/OhaeAceEditorTypes.ts',
+                        // mode: 'svelte',
+                        // fileUrl: '/files/OhaeAceEditorView.svelte',
+                    }
+                },
+                { view: 'resizer' }, // Предположим, что resizer не принимает дочерние элементы
                 {
                     view: 'layout',
                     direction: 'column',
@@ -121,7 +122,7 @@ export const bodyViewConfig: UiNodeConfig = {
             padding: 0,
             body: [
                 tabsViewConfigTop,
-                {view: 'resizer'},
+                { view: 'resizer' },
                 tabsViewConfig,
                 {
                     view: "layout",
@@ -129,7 +130,7 @@ export const bodyViewConfig: UiNodeConfig = {
                     minHeight: 26,
                     body: tabsViewConfigTop
                 },
-                {view: 'resizer'},
+                { view: 'resizer' },
                 {
                     view: 'layout',
                     direction: 'column',

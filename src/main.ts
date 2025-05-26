@@ -9,6 +9,7 @@ import './components/icons/OhaeIconOfTypeView.svelte';
 import './components/tabs/OhaeTabsView.svelte';
 import './components/tabs/OhaeTabItemView.svelte';
 import './components/tabs/OhaeTabButtonView.svelte';
+import './components/external/OhaeAceEditorView.svelte';
 
 
 // 2. Импортируйте вашу конфигурацию и функцию рендеринга
